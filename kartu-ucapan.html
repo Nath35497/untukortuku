@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kartu Ucapan Terima Kasih</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: #f5ede0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(210,180,140,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(180,140,100,0.2) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Floating petals */
+  .petal {
+    position: fixed;
+    width: 10px;
+    height: 14px;
+    border-radius: 50% 0 50% 0;
+    opacity: 0;
+    animation: fall linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .petal:nth-child(1)  { left: 10%; background: #e8c4a0; animation-duration: 6s; animation-delay: 0s; }
+  .petal:nth-child(2)  { left: 25%; background: #d4a574; animation-duration: 8s; animation-delay: 1s; }
+  .petal:nth-child(3)  { left: 45%; background: #c89a6a; animation-duration: 7s; animation-delay: 2s; }
+  .petal:nth-child(4)  { left: 65%; background: #e8c4a0; animation-duration: 9s; animation-delay: 0.5s; }
+  .petal:nth-child(5)  { left: 80%; background: #d4a574; animation-duration: 6.5s; animation-delay: 3s; }
+  .petal:nth-child(6)  { left: 55%; background: #c89a6a; animation-duration: 7.5s; animation-delay: 1.5s; }
+
+  @keyframes fall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 0.7; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* SCENE */
+  .scene {
+    position: relative;
+    width: 320px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ENVELOPE */
+  .envelope-wrapper {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .envelope-wrapper:active { transform: scale(0.97); }
+
+  .envelope-body {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, #c8864a 0%, #a0652a 100%);
+    border-radius: 6px 6px 12px 12px;
+    box-shadow: 0 8px 32px rgba(100,60,20,0.35), 0 2px 8px rgba(100,60,20,0.2);
+  }
+
+  /* envelope bottom triangle */
+  .envelope-body::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 100px;
+    background: linear-gradient(to top right, #b5752e 50%, transparent 50%),
+                linear-gradient(to top left,  #b5752e 50%, transparent 50%);
+    background-size: 50% 100%;
+    background-position: left, right;
+    background-repeat: no-repeat;
+    border-radius: 0 0 12px 12px;
+  }
+
+  /* envelope side triangles */
+  .envelope-body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom right, #be7d38 50%, transparent 50%),
+      linear-gradient(to bottom left,  #be7d38 50%, transparent 50%);
+    background-size: 50% 100%;
+    background-position: left, right;
+    background-repeat: no-repeat;
+    border-radius: 6px 6px 0 0;
+    clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
+  }
+
+  /* envelope flap */
+  .envelope-flap {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 110px;
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 5;
+  }
+
+  .envelope-flap::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 110px solid #d4924e;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+    backface-visibility: hidden;
+  }
+
+  /* flap inside */
+  .envelope-flap::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 110px solid #e8a060;
+    transform: rotateX(180deg);
+    backface-visibility: hidden;
+  }
+
+  .envelope-wrapper.open .envelope-flap {
+    transform: rotateX(-180deg);
+  }
+
+  /* wax seal */
+  .wax-seal {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    background: radial-gradient(circle at 35% 35%, #c0392b, #7b1f17);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    z-index: 6;
+    transition: opacity 0.3s;
+    font-size: 18px;
+    color: rgba(255,255,255,0.85);
+  }
+  .envelope-wrapper.open .wax-seal { opacity: 0; pointer-events: none; }
+
+  /* hint text */
+  .hint {
+    margin-top: 18px;
+    font-size: 13px;
+    color: #8a6040;
+    letter-spacing: 0.05em;
+    text-align: center;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50%       { opacity: 1; }
+  }
+  .hint.hidden { opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+
+  /* CARDS CONTAINER */
+  .cards-container {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease 0.4s;
+    z-index: 20;
+  }
+  .cards-container.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* CARD SWIPER */
+  .swiper-area {
+    width: 300px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .cards-track {
+    display: flex;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+
+  /* SINGLE CARD */
+  .card {
+    min-width: 300px;
+    background: #fffdf8;
+    border-radius: 16px;
+    box-shadow:
+      0 20px 60px rgba(100,60,20,0.25),
+      0 4px 16px rgba(100,60,20,0.15),
+      inset 0 0 0 1px rgba(200,160,100,0.3);
+    padding: 36px 28px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--accent);
+  }
+
+  .card-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+    animation: iconFloat 3s ease-in-out infinite;
+  }
+  @keyframes iconFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-6px); }
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #5a3010;
+    text-align: center;
+    margin-bottom: 14px;
+    line-height: 1.3;
+  }
+
+  .card-divider {
+    width: 50px;
+    height: 1.5px;
+    background: var(--accent);
+    margin-bottom: 16px;
+    border-radius: 2px;
+  }
+
+  .card-text {
+    font-size: 14.5px;
+    color: #7a5530;
+    text-align: center;
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .card-signature {
+    margin-top: 22px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: #a07040;
+  }
+
+  /* corner ornament */
+  .card::after {
+    content: '✦';
+    position: absolute;
+    bottom: 14px;
+    right: 18px;
+    font-size: 11px;
+    color: rgba(160,112,64,0.4);
+  }
+
+  /* DOTS */
+  .dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: rgba(160,112,64,0.3);
+    transition: background 0.3s, transform 0.3s;
+  }
+  .dot.active {
+    background: #c8864a;
+    transform: scale(1.4);
+  }
+
+  /* nav arrows */
+  .nav-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 14px;
+  }
+  .nav-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(160,112,64,0.5);
+    background: rgba(255,253,248,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    color: #a07040;
+    transition: background 0.2s, transform 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn:active { transform: scale(0.9); background: rgba(200,134,74,0.15); }
+
+  /* back btn */
+  .back-btn {
+    margin-top: 16px;
+    font-size: 12px;
+    color: #a07040;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: opacity 0.2s;
+  }
+  .back-btn:active { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- floating petals -->
+<div class="petal"></div>
+<div class="petal"></div>
+<div class="petal"></div>
+<div class="petal"></div>
+<div class="petal"></div>
+<div class="petal"></div>
+
+<div class="scene">
+
+  <!-- ENVELOPE STATE -->
+  <div id="envelopeState">
+    <div class="envelope-wrapper" id="envelope" onclick="openEnvelope()">
+      <div class="envelope-body"></div>
+      <div class="envelope-flap"></div>
+      <div class="wax-seal">♥</div>
+    </div>
+    <p class="hint" id="hint">✦ Ketuk untuk membuka surat ✦</p>
+  </div>
+
+  <!-- CARDS STATE -->
+  <div id="cardsState" style="display:none; flex-direction:column; align-items:center;">
+    <div class="cards-container" id="cardsContainer">
+      <div class="swiper-area" id="swiperArea">
+        <div class="cards-track" id="cardsTrack">
+
+          <!-- Card 1 -->
+          <div class="card" style="--accent: #d4844a;">
+            <div class="card-icon">🌸</div>
+            <h2 class="card-title">Terima Kasih<br>Dari Lubuk Hati</h2>
+            <div class="card-divider"></div>
+            <p class="card-text">
+              Kata-kata tak cukup untuk mengungkapkan rasa syukurku atas semua yang telah kamu lakukan.
+              Setiap bantuan, setiap kebaikan kecilmu, meninggalkan jejak hangat di hatiku.
+            </p>
+            <span class="card-signature">— Dengan penuh kasih 🌷</span>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="card" style="--accent: #7a9e7e;">
+            <div class="card-icon">🌿</div>
+            <h2 class="card-title">Kamu Membuat<br>Segalanya Berbeda</h2>
+            <div class="card-divider"></div>
+            <p class="card-text">
+              Di saat aku membutuhkan, kamu hadir tanpa diminta.
+              Ketulusanmu adalah hadiah paling berharga yang pernah aku terima.
+              Terima kasih telah ada untukku.
+            </p>
+            <span class="card-signature">— Selalu bersyukur 🍃</span>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="card" style="--accent: #b08abf;">
+            <div class="card-icon">✨</div>
+            <h2 class="card-title">Kebaikanmu<br>Tak Terlupakan</h2>
+            <div class="card-divider"></div>
+            <p class="card-text">
+              Setiap momen bersamamu adalah kenangan indah yang kusimpan.
+              Semoga segala kebaikan yang kamu berikan kembali padamu berlipat ganda.
+              Terima kasih, sahabatku.
+            </p>
+            <span class="card-signature">— Selamanya berterima kasih 💜</span>
+          </div>
+
+        </div><!-- /cards-track -->
+      </div><!-- /swiper-area -->
+    </div><!-- /cards-container -->
+
+    <div class="dots" id="dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
+    <div class="nav-row">
+      <div class="nav-btn" onclick="prevCard()">&#8592;</div>
+      <div class="nav-btn" onclick="nextCard()">&#8594;</div>
+    </div>
+
+    <span class="back-btn" onclick="closeEnvelope()">↩ Tutup surat</span>
+  </div>
+
+</div><!-- /scene -->
+
+<script>
+  const TOTAL = 3;
+  let current = 0;
+  let opened = false;
+  let startX = 0;
+  let isDragging = false;
+
+  function openEnvelope() {
+    if (opened) return;
+    opened = true;
+
+    const env = document.getElementById('envelope');
+    const hint = document.getElementById('hint');
+    env.classList.add('open');
+    hint.classList.add('hidden');
+
+    setTimeout(() => {
+      document.getElementById('envelopeState').style.display = 'none';
+      const cs = document.getElementById('cardsState');
+      cs.style.display = 'flex';
+      requestAnimationFrame(() => {
+        document.getElementById('cardsContainer').classList.add('visible');
+      });
+    }, 600);
+  }
+
+  function closeEnvelope() {
+    opened = false;
+    current = 0;
+    updateTrack(false);
+    updateDots();
+
+    document.getElementById('cardsContainer').classList.remove('visible');
+    setTimeout(() => {
+      document.getElementById('cardsState').style.display = 'none';
+      const es = document.getElementById('envelopeState');
+      es.style.display = 'block';
+      const env = document.getElementById('envelope');
+      env.classList.remove('open');
+      const hint = document.getElementById('hint');
+      hint.classList.remove('hidden');
+    }, 500);
+  }
+
+  function updateTrack(animate = true) {
+    const track = document.getElementById('cardsTrack');
+    track.style.transition = animate ? 'transform 0.45s cubic-bezier(0.4,0,0.2,1)' : 'none';
+    track.style.transform = `translateX(${-current * 300}px)`;
+  }
+
+  function updateDots() {
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+  }
+
+  function nextCard() {
+    if (current < TOTAL - 1) {
+      current++;
+      updateTrack();
+      updateDots();
+    }
+  }
+
+  function prevCard() {
+    if (current > 0) {
+      current--;
+      updateTrack();
+      updateDots();
+    }
+  }
+
+  // touch swipe
+  const area = document.getElementById('swiperArea');
+
+  area.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    isDragging = true;
+  }, { passive: true });
+
+  area.addEventListener('touchend', e => {
+    if (!isDragging) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if (dx < -40) nextCard();
+    else if (dx > 40) prevCard();
+    isDragging = false;
+  }, { passive: true });
+
+  // mouse swipe for desktop preview
+  area.addEventListener('mousedown', e => {
+    startX = e.clientX;
+    isDragging = true;
+  });
+  window.addEventListener('mouseup', e => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    if (dx < -40) nextCard();
+    else if (dx > 40) prevCard();
+    isDragging = false;
+  });
+</script>
+</body>
+</html>
